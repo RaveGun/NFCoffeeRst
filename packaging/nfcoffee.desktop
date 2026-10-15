@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=nfcoffee
+GenericName=Coffee reader manager
+Comment=Manage the NFC_SD_WIFI coffee reader (terminal UI)
+# The wrapper opens the terminal itself, so Terminal=false avoids a second one.
+Exec=nfcoffee-launch
+TryExec=nfcoffee-launch
+Terminal=false
+Categories=Utility;
+Keywords=coffee;nfc;wifi;nfcoffee;

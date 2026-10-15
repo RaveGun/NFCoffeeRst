@@ -1,0 +1,52 @@
+#!/bin/sh
+# nfcoffee-launch — start nfcoffee inside a terminal emulator.
+#
+# nfcoffee is a TUI: it has no window of its own and draws into a terminal.
+# Launching the bare binary from a file explorer gives it no controlling
+# terminal, so it aborts with "No such device or address (os error 6)" and
+# nothing appears. This wrapper finds a terminal emulator and runs nfcoffee
+# inside it.
+#
+# Terminal resolution order:
+#   1. $NFCOFFEE_TERMINAL   explicit override (e.g. NFCOFFEE_TERMINAL=ghostty)
+#   2. $TERMINAL            common convention
+#   3. xdg-terminal-exec    freedesktop "default terminal" spec
+#   4. x-terminal-emulator  Debian alternatives
+#   5. first known terminal emulator found in PATH
+#
+# Override the program to run with $NFCOFFEE_BIN (default: nfcoffee).
+set -eu
+
+BIN="${NFCOFFEE_BIN:-nfcoffee}"
+
+have() { command -v "$1" >/dev/null 2>&1; }
+
+# Terminals differ in how they accept a command to run.
+launch() {
+    case "$1" in
+        kitty)              exec kitty "$BIN" ;;
+        wezterm)            exec wezterm start -- "$BIN" ;;
+        gnome-terminal|kgx) exec "$1" -- "$BIN" ;;
+        *)                  exec "$1" -e "$BIN" ;;
+    esac
+}
+
+# 1 & 2: explicit overrides ($TERMINAL is only a name, not a full command line).
+for t in ${NFCOFFEE_TERMINAL:-} ${TERMINAL:-}; do
+    [ -n "$t" ] || continue
+    if have "$t"; then launch "$t"; fi
+    echo "nfcoffee-launch: '$t' not found in PATH, trying other terminals" >&2
+done
+
+# 3 & 4: generic default-terminal launchers.
+if have xdg-terminal-exec; then exec xdg-terminal-exec "$BIN"; fi
+if have x-terminal-emulator; then exec x-terminal-emulator -e "$BIN"; fi
+
+# 5: first known terminal emulator available.
+for t in alacritty ghostty foot kitty wezterm konsole gnome-terminal kgx xfce4-terminal xterm; do
+    if have "$t"; then launch "$t"; fi
+done
+
+echo "nfcoffee-launch: no terminal emulator found." >&2
+echo "  Install one, or point NFCOFFEE_TERMINAL at it (e.g. NFCOFFEE_TERMINAL=ghostty)." >&2
+exit 1

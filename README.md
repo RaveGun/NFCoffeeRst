@@ -22,6 +22,27 @@ protocol and the full design notes.
 cargo run --release
 ```
 
+### Launching from a file manager (Linux)
+
+`nfcoffee` is a **terminal UI** — it has no window of its own, so it needs a
+terminal to draw into. Launching the bare binary by double-clicking it in a file
+explorer gives it no terminal and it exits silently. Use the bundled launcher,
+which finds a terminal emulator for you
+(`$NFCOFFEE_TERMINAL` → `$TERMINAL` → `xdg-terminal-exec` → `x-terminal-emulator`
+→ the first of `alacritty`/`ghostty`/`foot`/`kitty`/`wezterm`/… found in `PATH`):
+
+```bash
+install -Dm755 packaging/nfcoffee-launch ~/.local/bin/nfcoffee-launch
+install -Dm644 packaging/nfcoffee.desktop ~/.local/share/applications/nfcoffee.desktop
+```
+
+Then start **nfcoffee** from your application menu, or run `nfcoffee-launch`
+from anywhere. To force a specific terminal:
+
+```bash
+NFCOFFEE_TERMINAL=ghostty nfcoffee-launch
+```
+
 ## Quick start (Windows)
 
 A prebuilt `dist/nfcoffee.exe` is produced by the cross-build (see below).
