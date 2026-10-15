@@ -43,6 +43,9 @@ from anywhere. To force a specific terminal:
 NFCOFFEE_TERMINAL=ghostty nfcoffee-launch
 ```
 
+If the bare binary is started without a terminal anyway, it now prints a short
+hint on how to run it instead of silently exiting.
+
 ## Quick start (Windows)
 
 A prebuilt `dist/nfcoffee.exe` is produced by the cross-build (see below).

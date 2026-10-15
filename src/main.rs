@@ -13,10 +13,12 @@ use ratatui::crossterm::execute;
 use ratatui::crossterm::terminal::{
     disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen,
 };
-use std::io::stdout;
+use std::io::{stdout, IsTerminal};
 use std::path::PathBuf;
 
 fn main() -> Result<()> {
+    ensure_terminal();
+
     let dir = resolve_data_dir()?;
     let cfg = config::Config::load(&dir)?;
     let db = db::Db::open(&dir.join("nfcoffee.db"))?;
@@ -47,6 +49,27 @@ fn main() -> Result<()> {
         std::process::exit(1);
     }
     Ok(())
+}
+
+/// A TUI needs a real terminal to draw into. When the binary is started
+/// without one (e.g. double-clicked from a file manager), `enable_raw_mode`
+/// fails with an error that goes to a terminal nobody is watching. Detect
+/// that case early and print something actionable instead.
+fn ensure_terminal() {
+    if std::io::stdin().is_terminal() {
+        return;
+    }
+    eprintln!();
+    eprintln!("nfcoffee is a terminal application and must be run from a terminal.");
+    eprintln!();
+    eprintln!("It was started without one (for example by double-clicking the binary");
+    eprintln!("or launching it from a file manager), so there is nothing to draw into.");
+    eprintln!();
+    eprintln!("Run it from a terminal:      nfcoffee");
+    #[cfg(unix)]
+    eprintln!("or use the bundled launcher: nfcoffee-launch");
+    eprintln!();
+    std::process::exit(1);
 }
 
 fn resolve_data_dir() -> Result<PathBuf> {
