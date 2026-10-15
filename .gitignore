@@ -1,0 +1,18 @@
+# Rust build output
+/target
+**/*.rs.bk
+*.pdb
+
+# Cross-build / distributables (attach these to GitHub Releases instead)
+/dist/
+
+# Runtime data written next to the executable (SQLite DB, settings, exports)
+/NFCoffeeData/
+
+# Editor and OS cruft
+.idea/
+.vscode/
+*.swp
+*~
+.DS_Store
+Thumbs.db
